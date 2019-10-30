@@ -7,6 +7,8 @@
 #include "config.h"
 #include "CRC_32.h"
 #include <ctime>
+#include "lib/SimpleIni.h"
+#include "windows.h"
 
 #include "zxmgr.h"
 
@@ -17,6 +19,12 @@ using namespace std;
 typedef unsigned char u_char;
 
 unsigned long _neI_SessionKey = 0, _neI_SessionID = 0;
+
+	DWORD hex2DWORD(const char * str){
+		char *pEnd;
+		long int a = strtoul(str, &pEnd, 16);
+		return a;
+	}
 
 void _stdcall crcmain(char* data)
 {
@@ -37,6 +45,27 @@ void _stdcall crcmain(char* data)
 	crc32_a2mgr_dll = crc.CalcCRC(sha1_a2mgr_dll, 20);
 	crc32_patch_res = crc.CalcCRC(sha1_patch_res, 20);
 	crc32_world_res = crc.CalcCRC(sha1_world_res, 20);
+
+	CSimpleIniA ini;
+	ini.SetUnicode();
+	ini.LoadFile("crc.ini");
+	const char * allodsCrcStr = ini.GetValue("crc", "allods2", NULL);
+	const char * a2mgrCrcStr = ini.GetValue("crc", "a2mgr", NULL);
+	const char * patchCrcStr = ini.GetValue("crc", "patch", NULL);
+	const char * worldCrcStr = ini.GetValue("crc", "world", NULL);
+	if (allodsCrcStr != NULL){
+		crc32_allods2_exe = hex2DWORD(allodsCrcStr);
+	}
+	if (a2mgrCrcStr != NULL){
+		crc32_a2mgr_dll = hex2DWORD(a2mgrCrcStr);
+	}
+	if (patchCrcStr != NULL){
+		crc32_patch_res = hex2DWORD(patchCrcStr);
+	}
+	if (worldCrcStr != NULL){
+		crc32_world_res = hex2DWORD(worldCrcStr);
+	}
+
 	//crc32_graphics_res = crc.CalcCRC(sha1_graphics_res, 20);
 
 	unsigned long lrc_allods2_exe = crc32_allods2_exe ^ net_key;
