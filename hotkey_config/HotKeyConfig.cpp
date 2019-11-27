@@ -38,6 +38,7 @@ bytearr stoba(string &str) {
 }
 
 void HotKeyConfig::load(string filename) {
+    bool comment = false;
     ifstream myfile (filename.c_str());
     stringstream ss;
     if (myfile.is_open())
@@ -54,18 +55,24 @@ void HotKeyConfig::load(string filename) {
                 case '\r':
                     //skip
                     break;
-                case '\n':
                 case ';':
+                    if(comment)
+                        break;
+                case '\n':
                     if(buffer.size() > 0 && hotkey != -1) {
                         hotkeys[hotkey].push_back(stoba(buffer));
                         buffer.clear();
                     }
+                    comment = false;
                     break;
                 case '=':
                     stringstream(buffer) >> hotkey;
                     buffer.clear();
                     break;
+                case '#':
+                    comment = true;
                 default:
+                    if(!comment)
                     if((ch >= '0' && ch <='9' )||
                             (ch >= 'a' && ch <= 'f')||
                             (ch >='A' && ch <='F')){
