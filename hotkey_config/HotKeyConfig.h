@@ -8,9 +8,9 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "../sbel_utils.h"
 
 using namespace std;
-typedef vector<char> bytearr;
 class HotKeyConfig {
 private:
     map<int, vector<bytearr>> hotkeys;
